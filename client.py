@@ -15,24 +15,39 @@ def read_txt():
     return pd.read_fwf('resultado.txt', header = None)
 
 def write_results(df):
-    df.to_csv('resultado.txt', header=None, index=None, sep=' ', mode='w')
+    df.to_csv('resultado.txt', header=None, index=None, mode='w', sep = ',')
 
-def max_next_move():
-    pass
+def max_next_move(plataforma, matriz):
+    maior = 0
+    idx = -1
+
+    for x in range(3):
+        if float(matriz[plataforma][x]) >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
+            maior = matriz[plataforma][x]
+            idx = x
+
+    return idx
+
+def chose_move(move):
+    if move == 0:
+        return 'left'
+
+    elif move == 1:
+        return 'right'
+
+    elif move == 2:
+        return 'jump'
 
 #Return the line of the matix
-def pos_matrix(str: binary):
-    num = int(binary, 2)
+def pos_matrix(bina):
+    num = int(bina, 2)
 
     return num // 24 + num % 4
-
-def 
 
 def main():
 
     #Declaração de Variáveis
-
-    LOOP_ITERAIONS = 10000
+    LOOP_ITERAIONS = 2
     LEARNING_RATE = 0.4
     DISCOUNT_FACTOR = 0.4
     reward = 0
@@ -40,15 +55,20 @@ def main():
     plataform = 0 # Você pode setar a plataforma e o giro inicial
     move = randint(0, 2)
     matriz = read_txt()
-    connect_port = cn.connect(2037)
-
+    print(matriz)
+    
+    connect_port = cn.connect(21804)
     #Loop de 10000 iterações, ao final ele vai salvar o resultado final da tabela
-    for x in range(LOOP_ITERAIONS):
-        next_move = max_next_move(plataform, move)
-        matriz[plataform][move] = matriz[plataform][move] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  - next_move - matriz[plataform][move])
+    for _ in range(LOOP_ITERAIONS):
+        next_move = max_next_move(plataform, matriz)
+        matriz[plataform][move] = matriz[plataform][move] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[plataform][next_move] - matriz[plataform][move])
+        move = next_move
+        print(matriz)
+        state, reward = cn.get_state_reward(connect_port, chose_move(move))
 
+        plataform = pos_matrix(state)
 
-
-
+    write_results(matriz)
+    connect_port.close()
 if __name__=="__main__":
     main()
