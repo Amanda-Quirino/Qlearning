@@ -19,7 +19,6 @@ def write_results(df):
 
 
 def max_next_move(plataforma, matriz):
-    print(plataforma)
     maior = matriz[0][plataforma]
     idx = 0
 
@@ -42,25 +41,27 @@ def chose_move(move):
 
 #Return the line of the matix
 def pos_matrix(bina):
-    num = int(bina, 2)
-
-    return num // 24 + num % 4
+    print(bina)
+    plataform = int(bina[2:7],2)
+    direction = int(bina[8:10],2)
+    print(f"plataforma: {plataform}")
+    return ((4 * plataform) + direction) +1
 
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 20
+    LOOP_ITERAIONS = 1000
     LEARNING_RATE = 0.4
     DISCOUNT_FACTOR = 0.4
     reward = 0
-
-    plataform = 0 # Você pode setar a plataforma e o giro inicial
+    
+    plataform = 41 # Você pode setar a plataforma e o giro inicial
     move = randint(0, 2)
     matriz = read_txt()
     print(matriz)
     connect_port = cn.connect(2037)
     if connect_port != 0:
-        #Loop de 10000 iterações, ao final ele vai salvar o resultado final da tabela
+        #Loop de x iterações, ao final ele vai salvar o resultado final da tabela
         for _ in range(LOOP_ITERAIONS):
             next_move = max_next_move(plataform, matriz)
             print(f"Next Move: {next_move}")
@@ -69,8 +70,8 @@ def main():
             print(action)
             state, reward = cn.get_state_reward(connect_port, action)
             move = next_move
-
             plataform = pos_matrix(state)
+            print(plataform)
 
         write_results(matriz)
         connect_port.close()
