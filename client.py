@@ -43,14 +43,15 @@ def chose_move(move):
 def pos_matrix(bina):
     print(bina)
     plataform = int(bina[2:7],2)
-    direction = int(bina[8:10],2)
+    direction = int(bina[7:9],2)
     print(f"plataforma: {plataform}")
+    print(f"Direção: {direction}")
     return ((4 * plataform) + direction) +1
 
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 1000
+    LOOP_ITERAIONS = 10
     LEARNING_RATE = 0.4
     DISCOUNT_FACTOR = 0.4
     reward = 0
@@ -62,16 +63,18 @@ def main():
     connect_port = cn.connect(2037)
     if connect_port != 0:
         #Loop de x iterações, ao final ele vai salvar o resultado final da tabela
-        for _ in range(LOOP_ITERAIONS):
+        for x in range(LOOP_ITERAIONS):
+            print(f"\n\nPrint iteração {x + 1}")
             next_move = max_next_move(plataform, matriz)
-            print(f"Next Move: {next_move}")
-            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][plataform] - matriz[move][plataform])
+            #Escolhe a acção e realiza ação
             action = chose_move(move)
-            print(action)
+            print("Movimento: ", action)
             state, reward = cn.get_state_reward(connect_port, action)
-            move = next_move
+            #Algoritmo QLearning
+            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][plataform] - matriz[move][plataform])
+            move = next_move #Atualiza o move 
             plataform = pos_matrix(state)
-            print(plataform)
+            print("Pos Martriz: ", plataform)
 
         write_results(matriz)
         connect_port.close()
