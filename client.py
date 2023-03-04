@@ -19,14 +19,13 @@ def write_results(df):
 
 
 def max_next_move(plataforma, matriz):
-    maior = 0
-    idx = -1
+    print(plataforma)
+    maior = matriz[0][plataforma]
+    idx = 0
 
-    print("Iteração")
-    for x in range(3):
-        print(x)
-        if matriz[plataforma][x] >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
-            maior = matriz[plataforma][x]
+    for x in range(1,3):
+        if matriz[x][plataforma] >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
+            maior = matriz[x][plataforma]
             idx = x
 
     return idx
@@ -50,7 +49,7 @@ def pos_matrix(bina):
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 5
+    LOOP_ITERAIONS = 20
     LEARNING_RATE = 0.4
     DISCOUNT_FACTOR = 0.4
     reward = 0
@@ -65,11 +64,11 @@ def main():
         for _ in range(LOOP_ITERAIONS):
             next_move = max_next_move(plataform, matriz)
             print(f"Next Move: {next_move}")
-            matriz[plataform][move] = matriz[plataform][move] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[plataform][next_move] - matriz[plataform][move])
-            move = next_move
+            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][plataform] - matriz[move][plataform])
             action = chose_move(move)
             print(action)
             state, reward = cn.get_state_reward(connect_port, action)
+            move = next_move
 
             plataform = pos_matrix(state)
 
