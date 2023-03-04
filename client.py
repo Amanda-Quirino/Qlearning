@@ -12,17 +12,20 @@ from random import randint
 
 
 def read_txt():
-    return pd.read_fwf('resultado.txt', header = None)
+    return pd.read_csv('resultado.txt', header = None, sep=' ')
 
 def write_results(df):
-    df.to_csv('resultado.txt', header=None, index=None, mode='w', sep = ',')
+    df.to_csv('resultado.txt', header=None, index=None, mode='w', sep = ' ')
+
 
 def max_next_move(plataforma, matriz):
     maior = 0
     idx = -1
 
+    print("Iteração")
     for x in range(3):
-        if float(matriz[plataforma][x]) >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
+        print(x)
+        if matriz[plataforma][x] >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
             maior = matriz[plataforma][x]
             idx = x
 
@@ -47,7 +50,7 @@ def pos_matrix(bina):
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 2
+    LOOP_ITERAIONS = 5
     LEARNING_RATE = 0.4
     DISCOUNT_FACTOR = 0.4
     reward = 0
@@ -56,19 +59,22 @@ def main():
     move = randint(0, 2)
     matriz = read_txt()
     print(matriz)
-    
-    connect_port = cn.connect(21804)
-    #Loop de 10000 iterações, ao final ele vai salvar o resultado final da tabela
-    for _ in range(LOOP_ITERAIONS):
-        next_move = max_next_move(plataform, matriz)
-        matriz[plataform][move] = matriz[plataform][move] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[plataform][next_move] - matriz[plataform][move])
-        move = next_move
-        print(matriz)
-        state, reward = cn.get_state_reward(connect_port, chose_move(move))
+    connect_port = cn.connect(2037)
+    if connect_port != 0:
+        #Loop de 10000 iterações, ao final ele vai salvar o resultado final da tabela
+        for _ in range(LOOP_ITERAIONS):
+            next_move = max_next_move(plataform, matriz)
+            print(f"Next Move: {next_move}")
+            matriz[plataform][move] = matriz[plataform][move] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[plataform][next_move] - matriz[plataform][move])
+            move = next_move
+            action = chose_move(move)
+            print(action)
+            state, reward = cn.get_state_reward(connect_port, action)
 
-        plataform = pos_matrix(state)
+            plataform = pos_matrix(state)
 
-    write_results(matriz)
-    connect_port.close()
+        write_results(matriz)
+        connect_port.close()
+
 if __name__=="__main__":
     main()
