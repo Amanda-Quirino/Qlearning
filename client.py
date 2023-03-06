@@ -51,13 +51,13 @@ def pos_matrix(bina):
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 3000
+    LOOP_ITERAIONS = 100
     LEARNING_RATE = 0.6
     DISCOUNT_FACTOR = 0.5
     reward = 0
     vitoria = 0
 
-    plataform = 85 # Você pode setar a plataforma e o giro inicial
+    plataform = 84 # Você pode setar a plataforma e o giro inicial
     move = 0
 
     next_move = randint(0, 2)
@@ -73,20 +73,22 @@ def main():
             action = chose_move(move)
             print("Movimento: ", action)
             state, reward = cn.get_state_reward(connect_port, action)
-
-            if reward < 0:
+            next_plataform = pos_matrix(state) #Pega a nova plataforma
+            if reward == 300:
                 vitoria += 1
-            #Algoritmo QLearning
-            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][plataform] - matriz[move][plataform])
-            move = next_move #Atualiza o move 
-            plataform = pos_matrix(state) #Pega a nova plataforma
-            print("Pos Martriz: ", plataform)
 
             #Escolhe a acção da próxima jogada
             x = randint(0, 10)
             next_move = max_next_move(plataform, matriz) if x <= 7 else randint(0, 2)
+            #Algoritmo QLearning
+            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][next_plataform] - matriz[move][plataform])
+            move = next_move #Atualiza o move 
+            plataform = next_plataform
+            print("Pos Martriz: ", plataform)
+
+ 
         print("Vitorias: ", vitoria)
-        write_results(matriz)
+        #write_results(matriz)
         connect_port.close()
 
 if __name__=="__main__":
