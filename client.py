@@ -19,11 +19,11 @@ def write_results(df):
 
 
 def max_next_move(plataforma, matriz):
-    maior = matriz[0][plataforma]
-    idx = 0
+    maior = -9999
+    idx = -1
 
-    for x in range(1,3):
-        if matriz[x][plataforma] > maior: #tem que garantir que as duas variáveis são do mesmo tipo!
+    for x in range(3):
+        if matriz[x][plataforma] >= maior: #tem que garantir que as duas variáveis são do mesmo tipo!
             maior = matriz[x][plataforma]
             idx = x
 
@@ -51,18 +51,20 @@ def pos_matrix(bina):
 def main():
 
     #Declaração de Variáveis
-    LOOP_ITERAIONS = 100
+    LOOP_ITERAIONS = 3000
     LEARNING_RATE = 0.6
     DISCOUNT_FACTOR = 0.5
     reward = 0
     vitoria = 0
+    next_move = 0
+    next_plataform = 0
 
-    plataform = 84 # Você pode setar a plataforma e o giro inicial
+    # Você pode setar a plataforma e o giro inicial
+    plataform = 68 
     move = 0
 
-    next_move = randint(0, 2)
     matriz = read_txt()
-    print(matriz)
+   
     connect_port = cn.connect(2037)
     if connect_port != 0:
         #Loop de x iterações, ao final ele vai salvar o resultado final da tabela
@@ -79,16 +81,16 @@ def main():
 
             #Escolhe a acção da próxima jogada
             x = randint(0, 10)
-            next_move = max_next_move(plataform, matriz) if x <= 7 else randint(0, 2)
+            next_move = max_next_move(next_plataform, matriz) if x <= 7 else randint(0, 2)
             #Algoritmo QLearning
-            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR *  -  matriz[next_move][next_plataform] - matriz[move][plataform])
+            matriz[move][plataform] = matriz[move][plataform] + LEARNING_RATE * (reward + DISCOUNT_FACTOR * (matriz[next_move][next_plataform] - matriz[move][plataform]))
             move = next_move #Atualiza o move 
             plataform = next_plataform
             print("Pos Martriz: ", plataform)
 
  
         print("Vitorias: ", vitoria)
-        #write_results(matriz)
+        write_results(matriz)
         connect_port.close()
 
 if __name__=="__main__":
